@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер: Меры величины</title>
+    <style>
+        /* Глубокая темная палитра GitHub */
+        :root {
+            --bg-dark: #0d1117;         /* Основной фон страницы */
+            --bg-panel: #161b22;        /* Фон карточки */
+            --bg-element: #21262d;      /* Фон кнопок */
+            --bg-hover: #30363d;        /* Наведение на кнопку */
+            --border-default: #30363d;  /* Рамки */
+            --border-focus: #58a6ff;    /* Синяя обводка */
+            --text-main: #c9d1d9;       /* Основной текст */
+            --text-muted: #8b949e;      /* Второстепенный текст */
+            --text-link: #58a6ff;       /* Ссылки */
+            --btn-green: #238636;       /* Зеленая кнопка */
+            --btn-green-hover: #2ea043; 
+            --success: #3fb950;         /* Успех */
+            --error: #f85149;           /* Ошибка */
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        .container {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-default);
+            border-radius: 6px;
+            width: 100%;
+            max-width: 520px;
+            padding: 24px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+        }
+
+        .header {
+            border-bottom: 1px solid var(--border-default);
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0;
+            color: #ffffff; /* Чистый белый для заголовка */
+        }
+
+        .header svg {
+            fill: var(--text-muted);
+            width: 18px;
+            height: 18px;
+        }
+
+        .menu-text {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .modes {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        /* Базовый стиль всех кнопок */
+        button {
+            background-color: var(--bg-element);
+            color: var(--text-main);
+            border: 1px solid rgba(240,246,252,0.1); /* Тонкая рамка как на GitHub */
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        button:hover {
+            background-color: var(--bg-hover);
+            border-color: #8b949e;
+        }
+
+        button:active {
+            background-color: #282e33;
+        }
+
+        button.active {
+            background-color: #1f6feb;
+            border-color: #1f6feb;
+            color: #ffffff;
+        }
+
+        button.primary {
+            background-color: var(--btn-green);
+            border: 1px solid rgba(240,246,252,0.1);
+            color: #ffffff;
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        button.primary:hover {
+            background-color: var(--btn-green-hover);
+        }
+
+        button.mix-btn {
+            grid-column: span 2;
+        }
+
+        .game-area {
+            display: none;
+        }
+
+        .score {
+            font-size: 13px;
+            color: var(--text-muted);
+            background-color: var(--bg-dark);
+            border: 1px solid var(--border-default);
+            border-radius: 4px;
+            padding: 4px 10px;
+            display: inline-block;
+            margin-bottom: 16px;
+        }
+
+        .question {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 20px 0;
+            min-height: 32px;
+            text-align: center;
+            color: #ffffff; /* Белый для акцента */
+            font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+        }
+
+        /* Поле ввода */
+        input[type="text"] {
+            width: 100%;
+            padding: 10px 12px;
+            font-size: 16px;
+            background-color: var(--bg-dark);
+            border: 1px solid var(--border-default);
+            border-radius: 6px;
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 16px;
+            font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.3); /* Синяя аура */
+        }
+
+        input[type="text"]:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background-color: var(--bg-element);
+        }
+
+        input[type="text"]::placeholder {
+            color: var(--text-muted);
+        }
+
+        .result {
+            font-size: 15px;
+            font-weight: 600;
+            height: 24px;
+            margin: 12px 0;
+            text-align: center;
+        }
+
+        .result.correct { color: var(--success); }
+        .result.incorrect { color: var(--error); }
+
+        .back-btn {
+            background-color: transparent;
+            border: none;
+            color: var(--text-link);
+            padding: 0;
+            margin-top: 16px;
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        .back-btn:hover {
+            text-decoration: underline;
+            background-color: transparent;
+            border-color: transparent;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <!-- Иконка в стиле GitHub -->
+        <svg viewBox="0 0 16 16" version="1.1" aria-hidden="true">
+            <path fill-rule="evenodd" d="M2 2.5A2.5 2.5 0 014.5 0h8.75a.75.75 0 01.75.75v12.5a.75.75 0 01-.75.75h-2.5a.75.75 0 110-1.5h1.75v-2h-8a1 1 0 00-.714 1.7.75.75 0 01-1.072 1.05A2.495 2.495 0 012 11.5v-9zm10.5-1V9h-8c-.356 0-.694.074-1 .208V2.5a1 1 0 011-1h8zM5 12.25v3.25a.25.25 0 00.4.2l1.45-1.087a.25.25 0 01.3 0L8.6 15.7a.25.25 0 00.4-.2v-3.25a.25.25 0 00-.25-.25h-3.5a.25.25 0 00-.25.25z"></path>
+        </svg>
+        <h1>Меры величины</h1>
+    </div>
+    
+    <div id="menu-screen">
+        <div class="menu-text">Выберите категорию для тренировки:</div>
+        <div class="modes">
+            <button onclick="startGame('length', this)">Меры длины</button>
+            <button onclick="startGame('time', this)">Меры времени</button>
+            <button onclick="startGame('mass', this)">Меры массы</button>
+            <button onclick="startGame('area', this)">Меры площади</button>
+            <button class="mix-btn" onclick="startGame('all', this)">Все сразу (Микс)</button>
+        </div>
+    </div>
+
+    <div id="game-screen" class="game-area">
+        <div class="score" id="score-display">Верно: 0 | Ошибок: 0</div>
+        <div class="question" id="question-text">Загрузка...</div>
+        
+        <input type="text" id="answer-input" placeholder="Введите число" onkeypress="handleKeyPress(event)" autocomplete="off">
+        
+        <button class="primary" onclick="checkAnswer()" id="check-btn">Проверить</button>
+        
+        <div class="result" id="result-text"></div>
+        
+        <button class="back-btn" onclick="backToMenu()">← Вернуться в меню</button>
+    </div>
+</div>
+
+<script>
+    // Базовые правила перевода
+    const rules = {
+        length: [
+            { big: "км", small: "м", factor: 1000 },
+            { big: "м", small: "дм", factor: 10 },
+            { big: "дм", small: "см", factor: 10 },
+            { big: "см", small: "мм", factor: 10 }
+        ],
+        time: [
+            { big: "нед", small: "сут", factor: 7 },
+            { big: "сут", small: "ч", factor: 24 },
+            { big: "ч", small: "мин", factor: 60 },
+            { big: "мин", small: "сек", factor: 60 }
+        ],
+        mass: [
+            { big: "т", small: "кг", factor: 1000 },
+            { big: "т", small: "ц", factor: 10 },
+            { big: "ц", small: "кг", factor: 100 },
+            { big: "кг", small: "гр", factor: 1000 }
+        ],
+        area: [
+            { big: "км²", small: "м²", factor: 1000000 },
+            { big: "м²", small: "дм²", factor: 100 },
+            { big: "дм²", small: "см²", factor: 100 },
+            { big: "см²", small: "мм²", factor: 100 },
+            { big: "а", small: "м²", factor: 100 }
+        ]
+    };
+
+    const multipliers = [1, 2, 3, 4, 5, 10, 15, 20, 50, 100];
+
+    let currentMode = '';
+    let currentAnswer = 0;
+    let score = 0;
+    let mistakes = 0;
+
+    function startGame(mode, btn) {
+        document.querySelectorAll('.modes button').forEach(b => b.classList.remove('active'));
+        if(btn) btn.classList.add('active');
+
+        currentMode = mode;
+        score = 0;
+        mistakes = 0;
+        updateScore();
+
+        document.getElementById('menu-screen').style.display = 'none';
+        document.getElementById('game-screen').style.display = 'block';
+        
+        nextQuestion();
+    }
+
+    function nextQuestion() {
+        let pool = [];
+        if (currentMode === 'all') {
+            for (let key in rules) pool = pool.concat(rules[key]);
+        } else {
+            pool = rules[currentMode];
+        }
+
+        const rule = pool[Math.floor(Math.random() * pool.length)];
+        const mult = multipliers[Math.floor(Math.random() * multipliers.length)];
+        const isReverse = Math.random() < 0.5;
+
+        let questionText = "";
+        if (!isReverse) {
+            questionText = `${mult} ${rule.big} = ? ${rule.small}`;
+            currentAnswer = mult * rule.factor;
+        } else {
+            const smallValue = mult * rule.factor;
+            questionText = `? ${rule.big} = ${smallValue} ${rule.small}`;
+            currentAnswer = mult;
+        }
+
+        document.getElementById('question-text').innerText = questionText;
+        
+        const input = document.getElementById('answer-input');
+        input.value = '';
+        input.focus();
+        input.disabled = false;
+        document.getElementById('check-btn').disabled = false;
+        document.getElementById('result-text').innerText = '';
+        document.getElementById('result-text').className = 'result';
+    }
+
+    function checkAnswer() {
+        const input = document.getElementById('answer-input');
+        const userAnswer = input.value.trim().replace(',', '.').replace(/\s/g, '');
+        const resultText = document.getElementById('result-text');
+
+        if (userAnswer === '') return;
+
+        if (parseFloat(userAnswer) === currentAnswer) {
+            resultText.innerText = "✅ Верно!";
+            resultText.className = "result correct";
+            score++;
+        } else {
+            const formattedAnswer = currentAnswer.toLocaleString('ru-RU');
+            resultText.innerText = `❌ Ошибка. Правильно: ${formattedAnswer}`;
+            resultText.className = "result incorrect";
+            mistakes++;
+        }
+
+        updateScore();
+        
+        input.disabled = true;
+        document.getElementById('check-btn').disabled = true;
+        
+        setTimeout(nextQuestion, 1800); 
+    }
+
+    function updateScore() {
+        document.getElementById('score-display').innerText = `Верно: ${score} | Ошибок: ${mistakes}`;
+    }
+
+    function handleKeyPress(e) {
+        if (e.key === 'Enter') checkAnswer();
+    }
+
+    function backToMenu() {
+        document.getElementById('game-screen').style.display = 'none';
+        document.getElementById('menu-screen').style.display = 'block';
+        document.querySelectorAll('.modes button').forEach(b => b.classList.remove('active'));
+    }
+</script>
+
+</body>
+</html>
